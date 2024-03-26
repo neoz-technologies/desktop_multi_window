@@ -76,7 +76,7 @@ void BaseFlutterWindow::SetBounds(double_t x, double_t y, double_t width, double
   //
   HMONITOR hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
 
-  UINT dpi = FlutterDesktopGetDpiForMonitor(monitor);
+  UINT dpi = FlutterDesktopGetDpiForMonitor(hMonitor);
   double scale_factor_ = dpi / 96.0;
 
   MoveWindow(handle, 
