@@ -63,10 +63,29 @@ void BaseFlutterWindow::SetBounds(double_t x, double_t y, double_t width, double
   if (!handle) {
     return;
   }
-  MoveWindow(handle, int32_t(x), int32_t(y),
-             static_cast<int>(width),
-             static_cast<int>(height),
-             TRUE);
+
+  RECT rc = {
+    static_cast<LONG>(x),
+    static_cast<LONG>(y),
+    static_cast<LONG>(x + width),
+    static_cast<LONG>(y + height),
+  };
+
+  //
+  // get the nearest monitor to the passed rect.
+  //
+  HMONITOR hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+
+  UINT dpi = FlutterDesktopGetDpiForMonitor(monitor);
+  double scale_factor_ = dpi / 96.0;
+
+  MoveWindow(handle, 
+    int32_t(x * scale_factor_), 
+    int32_t(y * scale_factor_),
+    static_cast<int>(width * scale_factor_),
+    static_cast<int>(height * scale_factor_),
+    TRUE
+  );
 }
 
 void BaseFlutterWindow::SetTitle(const std::string &title) {
