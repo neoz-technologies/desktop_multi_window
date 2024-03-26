@@ -28,7 +28,7 @@ class FlutterWindow : public BaseFlutterWindow {
 
  public:
 
-  FlutterWindow(int64_t id, std::string args, const std::shared_ptr<FlutterWindowCallback> &callback);
+  FlutterWindow(HWND main_window_handle, int64_t id, std::string args, const std::shared_ptr<FlutterWindowCallback> &callback);
   ~FlutterWindow() override;
 
   WindowChannel *GetWindowChannel() override {

@@ -45,6 +45,8 @@ class MultiWindowManager : public std::enable_shared_from_this<MultiWindowManage
 
   std::map<int64_t, std::unique_ptr<BaseFlutterWindow>> windows_;
 
+  HWND main_window_handle_;
+
   void HandleWindowChannelCall(
       int64_t from_window_id,
       int64_t target_window_id,

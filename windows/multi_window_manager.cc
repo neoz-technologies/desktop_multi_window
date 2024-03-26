@@ -56,7 +56,13 @@ int64_t MultiWindowManager::Create(std::string args) {
   g_next_id_++;
   int64_t id = g_next_id_;
 
-  auto window = std::make_unique<FlutterWindow>(id, std::move(args), shared_from_this());
+  auto window = std::make_unique<FlutterWindow>(
+    main_window_handle_,
+    id,
+    std::move(args),
+    shared_from_this()
+  );
+
   auto channel = window->GetWindowChannel();
   channel->SetMethodCallHandler([this](int64_t from_window_id,
                                        int64_t target_window_id,
@@ -84,6 +90,7 @@ void MultiWindowManager::AttachFlutterMainWindow(
              std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
         HandleWindowChannelCall(from_window_id, target_window_id, call, arguments, std::move(result));
       });
+  main_window_handle_ = main_window_handle;
   windows_[0] = std::make_unique<FlutterMainWindow>(main_window_handle, std::move(window_channel));
 }
 
