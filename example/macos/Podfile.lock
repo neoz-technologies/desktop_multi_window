@@ -1,7 +1,7 @@
 PODS:
   - desktop_lifecycle (0.0.1):
     - FlutterMacOS
-  - desktop_multi_window (0.0.1):
+  - desktop_multi_window (0.3.0):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
 
@@ -19,10 +19,10 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
 
 SPEC CHECKSUMS:
-  desktop_lifecycle: a600c10e12fe033c7be9078f2e929b8241f2c1e3
-  desktop_multi_window: 566489c048b501134f9d7fb6a2354c60a9126486
-  FlutterMacOS: 57701585bf7de1b3fc2bb61f6378d73bbdea8424
+  desktop_lifecycle: e4d2ff93af77bbbd473fe1a61773fdf9c5a79c91
+  desktop_multi_window: a26bd7ee3804934f14a6dcc837dfacfa03f7ad22
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
 
-PODFILE CHECKSUM: 6eac6b3292e5142cfc23bdeb71848a40ec51c14c
+PODFILE CHECKSUM: 0d3963a09fc94f580682bd88480486da345dc3f0
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.16.2

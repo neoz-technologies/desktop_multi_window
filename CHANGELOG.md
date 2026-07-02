@@ -1,3 +1,10 @@
+## 0.3.0
+
+* Support Flutter 3.44 / Dart 3: raise Dart SDK constraint to `>=3.0.0 <4.0.0`.
+* Migrate analyzer options from the removed `strong-mode: implicit-casts` to `language: strict-casts`.
+* Bump `flutter_lints` to `^5.0.0`.
+* Raise macOS minimum deployment target to 10.15.
+
 ## 0.2.0
 * Added the ability to determine whether a created window will be resizable or not
 ([#101](https://github.com/MixinNetwork/flutter-plugins/issues/101) and [#130](https://github.com/MixinNetwork/flutter-plugins/pull/130))

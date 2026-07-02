@@ -22,7 +22,7 @@ void main(List<String> args) {
 }
 
 class _ExampleMainWindow extends StatefulWidget {
-  const _ExampleMainWindow({Key? key}) : super(key: key);
+  const _ExampleMainWindow();
 
   @override
   State<_ExampleMainWindow> createState() => _ExampleMainWindowState();
@@ -81,10 +81,9 @@ class _ExampleMainWindowState extends State<_ExampleMainWindow> {
 
 class _ExampleSubWindow extends StatelessWidget {
   const _ExampleSubWindow({
-    Key? key,
     required this.windowController,
     required this.args,
-  }) : super(key: key);
+  });
 
   final WindowController windowController;
   final Map? args;
