@@ -4,6 +4,7 @@
 * Migrate analyzer options from the removed `strong-mode: implicit-casts` to `language: strict-casts`.
 * Bump `flutter_lints` to `^5.0.0`.
 * Raise macOS minimum deployment target to 10.15.
+* Add Swift Package Manager support for macOS (CocoaPods still supported).
 
 ## 0.2.0
 * Added the ability to determine whether a created window will be resizable or not
