@@ -35,6 +35,8 @@ class MultiWindowManager : public std::enable_shared_from_this<MultiWindowManage
 
   void SetTitle(int64_t id, const std::string &title);
 
+  void SetModal(int64_t id, bool modal);
+
   std::vector<int64_t> GetAllSubWindowIds();
 
   void OnWindowClose(int64_t id) override;

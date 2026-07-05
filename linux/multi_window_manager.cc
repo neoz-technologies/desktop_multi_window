@@ -126,6 +126,19 @@ void MultiWindowManager::SetTitle(int64_t id, const std::string &title) {
   }
 }
 
+void MultiWindowManager::SetModal(int64_t id, bool modal) {
+  auto window = windows_.find(id);
+  if (window == windows_.end()) {
+    return;
+  }
+  GtkWindow *parent = nullptr;
+  auto main_window = windows_.find(0);
+  if (main_window != windows_.end()) {
+    parent = main_window->second->GetGtkWindow();
+  }
+  window->second->SetModal(modal, parent);
+}
+
 std::vector<int64_t> MultiWindowManager::GetAllSubWindowIds() {
   std::vector<int64_t> ids;
   for (auto &window : windows_) {

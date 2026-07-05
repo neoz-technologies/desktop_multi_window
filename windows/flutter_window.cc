@@ -80,7 +80,7 @@ FlutterWindow::FlutterWindow(
     int64_t id,
     std::string args,
     const std::shared_ptr<FlutterWindowCallback> &callback
-) : callback_(callback), id_(id), window_handle_(nullptr), scale_factor_(1) {
+) : callback_(callback), id_(id), window_handle_(nullptr), owner_handle_(main_window_handle), scale_factor_(1) {
   RegisterWindowClass(FlutterWindow::WndProc);
 
   const POINT target_point = {static_cast<LONG>(10),
@@ -173,6 +173,9 @@ LRESULT FlutterWindow::MessageHandler(HWND hwnd, UINT message, WPARAM wparam, LP
       return 0;
     }
     case WM_CLOSE: {
+      // Re-enable the owner before this window is destroyed so focus returns
+      // to it and it does not stay permanently disabled.
+      ReleaseModal();
       if (auto callback = callback_.lock()) {
         callback->OnWindowClose(id_);
       }
@@ -211,7 +214,56 @@ LRESULT FlutterWindow::MessageHandler(HWND hwnd, UINT message, WPARAM wparam, LP
   return DefWindowProc(window_handle_, message, wparam, lparam);
 }
 
+void FlutterWindow::SetModal(bool modal) {
+  // The owner is normally captured at construction time. Fall back to the
+  // window's registered owner just in case it was not known back then, so a
+  // missing owner cannot silently turn the modal request into a no-op.
+  if (!owner_handle_) {
+    owner_handle_ = GetWindow(window_handle_, GW_OWNER);
+  }
+  if (!owner_handle_ || modal == is_modal_) {
+    return;
+  }
+  if (!modal) {
+    ReleaseModal();
+    return;
+  }
+  // Disabling the owner window is the standard Win32 way to make a window
+  // modal: the owner window and all of its child windows (including the
+  // Flutter view that renders the main UI) stop receiving keyboard and mouse
+  // input until the owner is enabled again.
+  EnableWindow(owner_handle_, FALSE);
+  is_modal_ = true;
+  // Disabling input is not enough on its own: if the main window keeps the
+  // activation/foreground it still looks and feels focusable. Explicitly pull
+  // this window in front of the disabled owner and take the activation so the
+  // main window can no longer be brought forward or focused.
+  if (window_handle_) {
+    ShowWindow(window_handle_, SW_SHOW);
+    BringWindowToTop(window_handle_);
+    SetForegroundWindow(window_handle_);
+    SetActiveWindow(window_handle_);
+  }
+}
+
+void FlutterWindow::ReleaseModal() {
+  if (!is_modal_) {
+    return;
+  }
+  is_modal_ = false;
+  if (owner_handle_) {
+    // Re-enable the owner *before* handing activation back, otherwise the
+    // still-disabled window cannot become active and focus would be lost.
+    EnableWindow(owner_handle_, TRUE);
+    SetForegroundWindow(owner_handle_);
+    SetActiveWindow(owner_handle_);
+  }
+}
+
 void FlutterWindow::Destroy() {
+  // Safety net: never leave the owner disabled if the window is destroyed
+  // without going through WM_CLOSE.
+  ReleaseModal();
   if (window_channel_) {
     window_channel_ = nullptr;
   }

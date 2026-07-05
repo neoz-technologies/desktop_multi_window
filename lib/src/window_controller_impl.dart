@@ -56,6 +56,14 @@ class WindowControllerMainImpl extends WindowController {
   }
 
   @override
+  Future<void> setModal(bool modal) {
+    return _channel.invokeMethod('setModal', <String, dynamic>{
+      'windowId': _id,
+      'modal': modal,
+    });
+  }
+
+  @override
   Future<void> resizable(bool resizable) {
     if (Platform.isMacOS) {
       return _channel.invokeMethod('resizable', <String, dynamic>{

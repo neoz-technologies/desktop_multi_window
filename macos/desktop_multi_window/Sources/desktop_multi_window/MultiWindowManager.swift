@@ -94,6 +94,15 @@ class MultiWindowManager {
     window.setTitle(title: title)
   }
 
+  func setModal(windowId: Int64, modal: Bool) {
+    guard let window = windows[windowId] else {
+      debugPrint("window \(windowId) not exists.")
+      return
+    }
+    // Modal windows block the main window (id 0).
+    window.setModal(modal: modal, parent: windows[0]?.nsWindow)
+  }
+
   func resizable(windowId: Int64, resizable: Bool) {
     guard let window = windows[windowId] else {
       debugPrint("window \(windowId) not exists.")

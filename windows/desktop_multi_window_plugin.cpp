@@ -92,6 +92,13 @@ void DesktopMultiWindowPlugin::HandleMethodCall(
     MultiWindowManager::Instance()->SetTitle(window_id, title);
     result->Success();
     return;
+  } else if (method_call.method_name() == "setModal") {
+    auto *arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
+    auto window_id = arguments->at(flutter::EncodableValue("windowId")).LongValue();
+    auto modal = std::get<bool>(arguments->at(flutter::EncodableValue("modal")));
+    MultiWindowManager::Instance()->SetModal(window_id, modal);
+    result->Success();
+    return;
   } else if (method_call.method_name() == "getAllSubWindowIds") {
     auto window_ids = MultiWindowManager::Instance()->GetAllSubWindowIds();
     result->Success(flutter::EncodableValue(window_ids));

@@ -30,6 +30,14 @@ class BaseFlutterWindow {
 
   void Center();
 
+  // Make this window modal and transient for `parent` (usually the main
+  // window), or clear the modal state when `modal` is false.
+  void SetModal(bool modal, GtkWindow *parent);
+
+  // Public accessor for the underlying GtkWindow, used to resolve the modal
+  // parent from another window instance.
+  GtkWindow *GetGtkWindow() { return GetWindow(); }
+
  protected:
 
   virtual GtkWindow* GetWindow() = 0;

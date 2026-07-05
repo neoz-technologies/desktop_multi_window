@@ -56,6 +56,22 @@ class _ExampleMainWindowState extends State<_ExampleMainWindow> {
               child: const Text('Create a new World!'),
             ),
             TextButton(
+              onPressed: () async {
+                final window =
+                    await DesktopMultiWindow.createWindow(jsonEncode({
+                  'args1': 'Modal sub window',
+                  'business': 'business_test',
+                }));
+                window
+                  ..setFrame(const Offset(0, 0) & const Size(600, 400))
+                  ..center()
+                  ..setTitle('Modal window')
+                  ..show()
+                  ..setModal(true);
+              },
+              child: const Text('Create a modal window'),
+            ),
+            TextButton(
               child: const Text('Send event to all sub windows'),
               onPressed: () async {
                 final subWindowIds =

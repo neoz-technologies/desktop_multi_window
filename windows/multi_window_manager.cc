@@ -129,6 +129,13 @@ void MultiWindowManager::SetTitle(int64_t id, const std::string &title) {
   }
 }
 
+void MultiWindowManager::SetModal(int64_t id, bool modal) {
+  auto window = windows_.find(id);
+  if (window != windows_.end()) {
+    window->second->SetModal(modal);
+  }
+}
+
 void MultiWindowManager::Center(int64_t id) {
   auto window = windows_.find(id);
   if (window != windows_.end()) {

@@ -52,3 +52,19 @@ void BaseFlutterWindow::Close() {
   }
   gtk_window_close(GTK_WINDOW(window));
 }
+
+void BaseFlutterWindow::SetModal(bool modal, GtkWindow *parent) {
+  auto window = GetWindow();
+  if (!window) {
+    return;
+  }
+  if (modal) {
+    if (parent) {
+      gtk_window_set_transient_for(GTK_WINDOW(window), parent);
+    }
+    gtk_window_set_modal(GTK_WINDOW(window), TRUE);
+  } else {
+    gtk_window_set_modal(GTK_WINDOW(window), FALSE);
+    gtk_window_set_transient_for(GTK_WINDOW(window), nullptr);
+  }
+}

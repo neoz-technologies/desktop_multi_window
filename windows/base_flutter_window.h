@@ -27,6 +27,10 @@ class BaseFlutterWindow {
 
   void Center();
 
+  // Make this window modal for its owner window. The default implementation
+  // does nothing; only owned sub windows support modality.
+  virtual void SetModal(bool modal) {}
+
  protected:
 
   virtual HWND GetWindowHandle() = 0;

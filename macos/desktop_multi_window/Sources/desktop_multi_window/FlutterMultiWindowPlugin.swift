@@ -67,6 +67,12 @@ public class FlutterMultiWindowPlugin: NSObject, FlutterPlugin {
       let title = arguments["title"] as! String
       MultiWindowManager.shared.setTitle(windowId: windowId, title: title)
       result(nil)
+    case "setModal":
+      let arguments = call.arguments as! [String: Any?]
+      let windowId = arguments["windowId"] as! Int64
+      let modal = arguments["modal"] as! Bool
+      MultiWindowManager.shared.setModal(windowId: windowId, modal: modal)
+      result(nil)
 	case "resizable":
 	  let arguments = call.arguments as! [String: Any?]
 	  let windowId = arguments["windowId"] as! Int64

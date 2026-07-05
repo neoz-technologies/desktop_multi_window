@@ -35,6 +35,8 @@ class FlutterWindow : public BaseFlutterWindow {
     return window_channel_.get();
   }
 
+  void SetModal(bool modal) override;
+
  protected:
 
   HWND GetWindowHandle() override { return window_handle_; }
@@ -44,6 +46,12 @@ class FlutterWindow : public BaseFlutterWindow {
   std::weak_ptr<FlutterWindowCallback> callback_;
 
   HWND window_handle_;
+
+  // The owner (main) window that is disabled while this window is modal.
+  HWND owner_handle_;
+
+  // Whether this window currently disables its owner as a modal window.
+  bool is_modal_ = false;
 
   int64_t id_;
 
@@ -61,6 +69,10 @@ class FlutterWindow : public BaseFlutterWindow {
   static FlutterWindow *GetThisFromHandle(HWND window) noexcept;
 
   LRESULT MessageHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+  // Re-enables the owner window and returns activation to it if this window is
+  // currently modal. Safe to call when the window is not modal.
+  void ReleaseModal();
 
   void Destroy();
 };

@@ -66,6 +66,12 @@ static void desktop_multi_window_plugin_handle_method_call(
     auto title = fl_value_get_string(fl_value_lookup_string(args, "title"));
     MultiWindowManager::Instance()->SetTitle(window_id, title);
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
+  } else if (strcmp(method, "setModal") == 0) {
+    auto *args = fl_method_call_get_args(method_call);
+    auto window_id = fl_value_get_int(fl_value_lookup_string(args, "windowId"));
+    auto modal = fl_value_get_bool(fl_value_lookup_string(args, "modal"));
+    MultiWindowManager::Instance()->SetModal(window_id, modal);
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
   } else if (strcmp(method, "getAllSubWindowIds") == 0) {
     auto window_ids = MultiWindowManager::Instance()->GetAllSubWindowIds();
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(

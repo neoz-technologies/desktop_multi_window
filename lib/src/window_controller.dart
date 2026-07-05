@@ -36,6 +36,22 @@ abstract class WindowController {
   /// Set the window's title.
   Future<void> setTitle(String title);
 
+  /// Make this window modal (or non-modal).
+  ///
+  /// While a window is modal the user cannot focus or bring the main
+  /// application window forward until this window is closed or made non-modal
+  /// again.
+  ///
+  /// * macOS: attaches the window as a child of the main window and keeps
+  ///   focus on it, so the main window can no longer be focused.
+  /// * Windows: disables the owner (main) window while this window is shown.
+  /// * Linux: marks the window as modal and transient for the main window.
+  ///
+  /// The modal relationship is released automatically when the window is
+  /// closed; call `setModal(false)` to release it while keeping the window
+  /// open.
+  Future<void> setModal(bool modal);
+
   /// Whether the window can be resized. Available only on macOS.
   ///
   /// Most useful for ensuring windows *cannot* be resized. Windows are
