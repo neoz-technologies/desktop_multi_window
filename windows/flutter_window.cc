@@ -237,14 +237,26 @@ LRESULT FlutterWindow::MessageHandler(HWND hwnd, UINT message, WPARAM wparam, LP
   return DefWindowProc(window_handle_, message, wparam, lparam);
 }
 
-void FlutterWindow::SetModal(bool modal) {
+HWND FlutterWindow::OwnerWindow() {
   // The owner is normally captured at construction time. Fall back to the
   // window's registered owner just in case it was not known back then, so a
   // missing owner cannot silently turn the modal request into a no-op.
   if (!owner_handle_) {
     owner_handle_ = GetWindow(window_handle_, GW_OWNER);
   }
-  if (!owner_handle_ || modal == is_modal_) {
+  if (!owner_handle_) {
+    return nullptr;
+  }
+  // The handle the plugin was attached to is usually the main window's Flutter
+  // *view*: plugins are registered before the runner re-parents that view into
+  // the window, so the ancestor lookup done back then could not see the window
+  // yet. Walking up to the root now yields the actual top level window.
+  return GetAncestor(owner_handle_, GA_ROOT);
+}
+
+void FlutterWindow::SetModal(bool modal) {
+  HWND owner = OwnerWindow();
+  if (!owner || modal == is_modal_) {
     return;
   }
   if (!modal) {
@@ -252,14 +264,15 @@ void FlutterWindow::SetModal(bool modal) {
     return;
   }
   is_modal_ = true;
-  ModalCounts()[owner_handle_]++;
+  modal_owner_ = owner;
+  ModalCounts()[owner]++;
   // Disable the owner's *content view*, not the owner window itself. Disabling
   // the top level window is the textbook Win32 way to be modal, but Windows
   // answers every click on a disabled top level window with the system
   // "not allowed" beep - which is what the user hears for every click next to
   // the modal window. A click on a disabled child window is silently handed to
   // its parent instead, so the owner is just as inert, without the noise.
-  HWND owner_view = GetContentView(owner_handle_);
+  HWND owner_view = GetContentView(owner);
   if (owner_view) {
     EnableWindow(owner_view, FALSE);
     if (GetFocus() == owner_view) {
@@ -269,7 +282,7 @@ void FlutterWindow::SetModal(bool modal) {
   // With the owner window itself still enabled, clicks on it have to be
   // answered by hand: swallow them and bring this window forward, the way a
   // real modal dialog does.
-  SetWindowSubclass(owner_handle_, FlutterWindow::OwnerSubclassProc,
+  SetWindowSubclass(owner, FlutterWindow::OwnerSubclassProc,
                     reinterpret_cast<UINT_PTR>(this),
                     reinterpret_cast<DWORD_PTR>(this));
   // Disabling input is not enough on its own: if the main window keeps the
@@ -310,13 +323,16 @@ void FlutterWindow::ReleaseModal() {
     return;
   }
   is_modal_ = false;
-  if (!owner_handle_) {
+  // Release exactly the window that was locked, even if the owner chain moved.
+  HWND owner = modal_owner_;
+  modal_owner_ = nullptr;
+  if (!owner) {
     return;
   }
-  RemoveWindowSubclass(owner_handle_, FlutterWindow::OwnerSubclassProc,
+  RemoveWindowSubclass(owner, FlutterWindow::OwnerSubclassProc,
                        reinterpret_cast<UINT_PTR>(this));
   auto &counts = ModalCounts();
-  auto count = counts.find(owner_handle_);
+  auto count = counts.find(owner);
   if (count != counts.end() && --count->second > 0) {
     // Another modal window is still open on the same owner; it stays locked.
     return;
@@ -326,12 +342,12 @@ void FlutterWindow::ReleaseModal() {
   }
   // Re-enable the owner's view *before* handing activation back, otherwise the
   // still-disabled view cannot take the keyboard focus again.
-  HWND owner_view = GetContentView(owner_handle_);
+  HWND owner_view = GetContentView(owner);
   if (owner_view) {
     EnableWindow(owner_view, TRUE);
   }
-  SetForegroundWindow(owner_handle_);
-  SetActiveWindow(owner_handle_);
+  SetForegroundWindow(owner);
+  SetActiveWindow(owner);
   if (owner_view) {
     SetFocus(owner_view);
   }

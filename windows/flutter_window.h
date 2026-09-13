@@ -47,11 +47,16 @@ class FlutterWindow : public BaseFlutterWindow {
 
   HWND window_handle_;
 
-  // The owner (main) window that is locked while this window is modal.
+  // The handle this window was attached to. Usually the main window's Flutter
+  // view rather than the window itself; see `OwnerWindow`.
   HWND owner_handle_;
 
   // Whether this window currently locks its owner as a modal window.
   bool is_modal_ = false;
+
+  // The top level window locked while this window is modal, remembered so the
+  // release undoes exactly what the lock did.
+  HWND modal_owner_ = nullptr;
 
   int64_t id_;
 
@@ -74,6 +79,10 @@ class FlutterWindow : public BaseFlutterWindow {
                                             UINT_PTR subclass_id, DWORD_PTR reference_data);
 
   LRESULT MessageHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+  // The top level window this window is modal to, resolved from the handle the
+  // plugin was attached to. Returns nullptr when there is no owner.
+  HWND OwnerWindow();
 
   // Re-enables the owner window and returns activation to it if this window is
   // currently modal. Safe to call when the window is not modal.
