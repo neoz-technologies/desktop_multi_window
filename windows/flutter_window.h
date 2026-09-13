@@ -47,10 +47,10 @@ class FlutterWindow : public BaseFlutterWindow {
 
   HWND window_handle_;
 
-  // The owner (main) window that is disabled while this window is modal.
+  // The owner (main) window that is locked while this window is modal.
   HWND owner_handle_;
 
-  // Whether this window currently disables its owner as a modal window.
+  // Whether this window currently locks its owner as a modal window.
   bool is_modal_ = false;
 
   int64_t id_;
@@ -67,6 +67,11 @@ class FlutterWindow : public BaseFlutterWindow {
   static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
   static FlutterWindow *GetThisFromHandle(HWND window) noexcept;
+
+  // Subclass installed on the owner window while this window is modal. Clicks
+  // on the locked owner are swallowed there and bring this window forward.
+  static LRESULT CALLBACK OwnerSubclassProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam,
+                                            UINT_PTR subclass_id, DWORD_PTR reference_data);
 
   LRESULT MessageHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 

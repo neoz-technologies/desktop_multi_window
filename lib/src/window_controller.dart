@@ -44,7 +44,10 @@ abstract class WindowController {
   ///
   /// * macOS: attaches the window as a child of the main window and keeps
   ///   focus on it, so the main window can no longer be focused.
-  /// * Windows: disables the owner (main) window while this window is shown.
+  /// * Windows: disables the owner (main) window's content and swallows clicks
+  ///   on it, bringing this window forward instead. (The owner window itself
+  ///   stays enabled on purpose: Windows answers every click on a disabled top
+  ///   level window with the system "not allowed" beep.)
   /// * Linux: marks the window as modal and transient for the main window.
   ///
   /// The modal relationship is released automatically when the window is
